@@ -1,0 +1,480 @@
+<html>
+	<head>
+		<style>
+			body {
+				background: white;
+				font-family:arial;
+				font-size: 14px;
+				margin:30px;
+			}
+			table {
+				margin: 10px 0px;
+				border-collapse: collapse;				
+				font-size:1em;
+			}
+			td {
+				vertical-align: top;
+			}
+			th {
+				background: #f5f5f5;
+			}
+			td, th {
+				padding: 3px 10px;
+				border: 1px solid #c6c6c6;
+			}
+			tr.alt {
+				background: #f5f5f5;
+			}
+		</style>
+	</head>
+	<body>
+		<h2 style="margin-bottom:0px">VB2Delphi Migration Kit Help</h2>
+		<small>Copyright(c) 2008-2011 Albert Almeida (caviola@gmail.com)</small>
+		<h3>About Conversion Maps</h3>		
+		<p>
+			VB2Delphi lets you transform expressions that refer to entities in external VB libraries to 
+			match analogous entities in Delphi's libraries. You can, for example, change a VB control's type name 
+			to the equivalent Delphi VCL component's type name or change the order of arguemnts in a method call to conform to 
+			the prototype of a Delphi method that offers the same funtionality.
+		</p>
+		<p>
+			You describe the contents of a VB library and the pertinent transformations in a <i>conversion map file</i>.
+			VB2Delphi uses the information inside a conversion map for two purposes: (1) to perform type resolution on an expression that refers to an external name
+			and (2) to obtain the pertinent transformation to generate the Delphi expression.
+			Transformations are applied at the expression level and are specified on a per-entity basis 
+			using <a href="#templates">mapping templates</a>.
+		</p>		
+		<p>For example, with the aid of an appropriate convertion map(s) VB2Delphi can perform all these code transformations:</p>
+		<table>
+			<thead>
+				<tr>
+					<th>VB</th>
+					<th>Delphi</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><code>p = MyForm.Point(x, y)</code></td>
+					<td><code>p := MyForm.Canvas.Pixels[x, y];</code></td>
+				</tr>
+				<tr>
+					<td><code>D = VBA.CVDate("07/12/1979")</code></td>
+					<td><code>D := VarToDateTime('07/12/1979');</code></td>
+				</tr>
+				<tr>
+					<td><code>If MsgBox("Sure?", VbYesNo) = vbYes Then</code></td>
+					<td><code>if Application.MessageBox('Sure?', '', MB_YESNO) = ID_YES then</code></td>
+				</tr>					
+				<tr>
+					<td><code>Dim vt as VBA.VbVarType</code></td>
+					<td><code>var vt : TVarType;</code></td>
+				</tr>					
+				<tr>
+					<td><code>br = vbAbort</code></td>
+					<td><code>br := ID_ABORT;</code></td>
+				</tr>										
+				<tr>
+					<td><code>SavePicture pic, "mypic.bmp"</code></td>
+					<td><code>pic.SaveToFile('mypic.bmp');</code></td>
+				</tr>															
+				<tr>
+					<td><code>MyProperty = 10 * n</code></td>
+					<td><code>MyPropertyProc( 10 * n );</code></td>
+				</tr>															
+			</tbody>
+		</table>
+		<h3>Structure of a Conversion Map File</h3>
+		<p>
+			The structure of a map is tree-based and hence easily represented 
+			in XML. A map consists of a root <b>library</b> element with any number of <b>enum</b>, <b>record</b>, <b>module</b> 
+			and <b>class</b> sub-elements that describe 
+			the member types of the library. These type description elements may contain any number of <b>const</b>, <b>var</b>, 
+			<b>func</b>, <b>sub</b>, <b>propget</b> and <b>propput</b> sub-elements that describe the members of these types.
+			The following table shows all valid element names, their meaning and applicable sub-elements.
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Element</th>
+					<th>Meaning</th>
+					<th>Sub-Elements</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>library</td>
+					<td>The root element of a map file.</td>
+					<td>
+						enum<br>
+						record<br>
+						module<br>
+						class<br>
+					</td>
+				</tr>
+				<tr>
+					<td>enum</td>
+					<td>Describes an enumerated type.</td>
+					<td>const</td>
+				</tr>
+				<tr>
+					<td>record</td>
+					<td>Describes a record type.</td>
+					<td>var</td>
+				</tr>
+				<tr>
+					<td>module</td>
+					<td>Describes a set of static members.</td>
+					<td>
+						var<br>
+						sub<br>
+						func<br>
+						propget<br>
+						propput<br>
+					</td>
+				</tr>
+				<tr>
+					<td>class</td>
+					<td>Describes a class type.</td>
+					<td>
+						var<br>
+						sub<br>
+						func<br>
+						propget<br>
+						propput<br>						
+					</td>
+				</tr>
+				<tr>
+					<td>const</td>
+					<td>Describes a constant.</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>var</td>
+					<td>Describes a record field or a module/class variable/property.</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>sub</td>
+					<td>Describes a subroutine.</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>func</td>
+					<td>Describes a function.</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>propput</td>
+					<td>Describes a property letter/setter function.</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td>propget</td>
+					<td>Describes a property getter function.</td>
+					<td>&nbsp;</td>
+				</tr>					
+			</tbody>
+		</table>			
+		<p>The following tables shows the applicable attributes for each element and their meanings</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Attribute</th>
+					<th>Meaning</th>
+					<th>Applies To</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>name</td>
+					<td>The name of the described VB entity.<b>This is the only mandatory attribute.</b><br>
+					</td>
+					<td style="white-space:nowrap;">All elements.</td>
+				</tr>
+				<tr>
+					<td>argc</td>
+					<td>
+						The number of arguments expected by a VB sub, func, propget or propput.<br>
+						This attribute is not mandatory but <b>you are advised to always provide it</b> as it's
+						used to more accurately identify the entity to which a given name refers in an expression.
+					</td>
+					<td>
+						func<br>
+						sub<br>
+						propget<br>
+						propput<br>
+					</td>
+				</tr>
+				<tr>
+					<td>type</td>
+					<td>
+						Specifies the type of a variable or the return type of a function/property.<br>
+						Intrinsic VB types are represented with their own names, e.g. <code>string</code> as well as user defined types, e.g. <code>ClipBoardConstants</code>.<br>
+						When referencing a type from another library the type name should be qualified with the library name just like in VB, e.g. <code>stdole.Font</code>.<br>
+						
+					</td>
+					<td>
+						var<br>
+						func<br>
+						propget<br>
+					</td>
+				</tr>
+				<tr>
+					<td>baseClass</td>
+					<td>
+						Specifies the class from which to inherit some of the members descriptions.<br>
+						For example, we can put all common members of the VB intrinsic controls in the <code>Control</code> class.<br>
+						This way we don't need to declare the <code>Width</code> property in both <code>TextBox</code> and <code>Label</code>.<br>
+						Instead, we declare <code>Width</code> only in <code>Control</code>
+						and make <code>TextBox</code> and <code>Label</code> 
+						inherit from <code>Control</code> with <code>baseClass="Control"</code>.
+					</td>
+					<td>class</td>
+				</tr>
+				<tr>
+					<td>map</td>
+					<td>
+					Mapping template string.<br> 
+					Only the actual external name and its arguments(if any) may be changed. <br>
+					More on this in the following section.					
+					</td>
+					<td>All elements.</td>
+				</tr>
+				<tr>
+					<td>nameMap</td>
+					<td>Specifies solely a name substitution.</td>
+					<td>All elements.</td>
+				</tr>
+				<tr>
+					<td>fullMap</td>
+					<td>
+					Mapping template string.
+					All parts of the expression may be changed.<br>
+					More on this in the following section.
+					</td>
+					<td>All elements.</td>
+				</tr>
+				</tbody>
+		</table>			
+		<p>Here is a sample conversion map file that only describes the contents of a VB library.
+		</p>
+		<code>
+<pre style="background:#f5f5f5;padding:10px">
+&lt;?xml version="1.0" encoding="iso-8859-1" ?&gt;
+&lt;library name="VBA"&gt;
+  &lt;module name="Constants"&gt;
+    &lt;const name="vbCrLf"/&gt;
+    &lt;const name="vbNullChar"/&gt;
+  &lt;/module&gt;
+  &lt;module name="Strings"&gt;
+    &lt;func name="Space" type="string"/&gt;
+    &lt;func name="Left" type="string"/&gt;
+  &lt;/module&gt;
+  &lt;enum name="VbVarType"/&gt;
+&lt;/library&gt;
+</pre>
+</code>		
+		<p>
+			A conversion map file must have the same name as the file containing the library 
+			that it describes suffixed with the .vb2d extension. For example, your custom 
+			conversion map for the Common Controls Library COMCT232.OCX 
+			must be named COMCT232.OCX.vb2d. The exception to this convention are
+			the names for the VB standard library maps, which are: <b>VB.vb2d</b>, <b>VBA.vb2d</b> and <b>VBRUN.vb2d</b>.
+			Keep in mind that a <i>library name</i> is not the same thing as the <i>library file name</i>. 
+			Considering the above example, the library file name is COMCT232.OCX but the library name is ComCtl2.
+			Likewise, the library file name for the Data Grid Control is MSDATGRD.OCX but the library name is MSDataGridLib.
+			The library name is what goes in the <i>name</i> attribute of the one and only <i>library</i> element of a conversion map file.
+			When VB2Delphi is analyzing a 
+			project file (.VBP) or a form (.FRM) and it encounters a <i>Reference</i> or <i>Object</i> line 
+			it extract the library name, appends .vb2d to it and searches for the resulting file name 
+			in the directory where the conversion maps reside. 			
+			The default path for maps is <i>maps</i> in
+			the instalation directory. The maps for the VB standard library are always loaded automatically.			
+		</p>
+		<p>
+			The GenVB2D program generates skeleton conversion map files. This tool takes a library file path 
+			and generates by default a conversion map with all the entities defined in the library.
+		</p>
+		<a name="templates"/>
+		<h3>Mapping Template Syntax</h3>
+		<p>						
+			A mapping template is an string containing regular text and special placeholders variables that let you access
+			specific parts of an expression. 
+			In general, a VB expression involving a name has the following form:
+			<p><i>qualifier.<b>externalName</b>(arg1, arg2...argN) = value</i></p>
+			Of course, all parts are not always present and neither they apply to every kind of expression.
+			The <i>value</i> part applies only to assignments, the <i>(arg1, arg2...argN)</i> part to functions/subroutines/properties
+			taking arguments and <i>qualifier</i> is present only in members-access expressions. The following tables shows some sample
+			expressions and their parts according to the general form:
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Expression</th>
+					<th>Meaning</th>
+					<th>Qualifier</th>
+					<th>External Name</th>
+					<th>Arguments</th>
+					<th>Value</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><code>VBA.VbVarType</code></td>
+					<td>A type reference.</td>
+					<td><code>VBA</code></td>
+					<td><code>VbVarType</code></td>
+					<td></td>
+					<td></td>					
+				</tr>
+				<tr>
+					<td><code>vbOKCancel</code></td>
+					<td>An enumerated constant.</td>
+					<td></td>
+					<td><code>vbOKCancel</code></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><code>Err.Raise 12, "Error!"</code></td>
+					<td>A subroutine call.</td>
+					<td><code>Err</code></td>
+					<td><code>Raise</code></td>
+					<td><code>12, "Error!"</code></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td><code>Err.HelpFile = "help.hlp"</code></td>
+					<td>An assignment statement.</td>
+					<td><code>Err</code></td>
+					<td><code>HelpFile</code></td>
+					<td></td>
+					<td><code>"help.hlp"</code></td>
+				</tr>
+				<tr>
+					<td><code>Hobbies("albert") = "Card Magic/Dancing"</code></td>
+					<td>A property-put statement.</td>
+					<td><code></code></td>
+					<td><code>Hobbies</code></td>
+					<td><code>"albert"</code></td>
+					<td><code>"Card Magic/Dancing"</code></td>
+				</tr>
+				
+			</tbody>
+		</table>
+		<p>
+			When VB2Delphi encounters an expression refering to an external name, 
+			it takes the mapping template along with the expression parts
+			and applies the requested substitutions to produce the Delphi expression. 			
+		</p>
+		<p>			
+			The following table describes the syntax of these placeholder variables.
+			Inside a mapping template anything that doesn't conform to this syntax is considered regular text and is left untouched.
+		</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Placeholder</th>
+					<th>Meaning</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>%Q.</td>
+					<td>
+						Replace by qualifier if provided.<br>
+						Note that this may be followed a dot char.<br>
+						If the qualifier has been provided it's replaced followed by the dot char.<br>
+						Otherwise the dot is not written.
+					</td>
+				</tr>
+				<tr>
+					<td>%W</td>
+					<td>
+					Replace by qualifier.<br>
+					If the expression is not explicitly qualified
+					this is replaced by the most recent "With" statement expression.
+					</td>
+				</tr>
+				<tr>
+					<td>%n{alt}</td>
+					<td>
+						Replace by argument at position "n".<br>
+						If argument "n" is omitted the optional mapping template "alt" is processed.<br>
+						To avoid potential infine recursion, if "alt" contains an argument placeholder,
+						its "alt" is not processed this time.
+					</td>
+				</tr>
+				<tr>
+					<td>%V</td>
+					<td>Refers to the value of an assignment.</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>The following table shows some sample uses of the placeholder variables.</p>
+		<table>
+			<thead>
+				<tr>
+					<th>VB</th>
+					<th>Template</th>					
+					<th>Delphi</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>					
+					<td><code>p = MyForm.Point(x, y)</code> </td>
+					<td><code>Canvas.Pixels[%1, %2]</code><br>	
+					<small>Template specified for <code>Point</code>.</small>
+					</td>
+					<td><code>p := MyForm.Canvas.Pixels[x, y];</code></td>
+				</tr>
+				<tr>					
+					<td><code>D = VBA.CVDate("07/12/1979")</code></td>
+					<td><code>VarToDateTime(%1)</code><br>	
+					<small>Template specified for <code>CVDate</code>.</small></td>
+					<td><code>D := VarToDateTime('07/12/1979');</code></td>
+				</tr>
+				<tr>
+					<td><code>If MsgBox("Sure?", VbYesNo) = vbYes Then</code></td>
+					<td><code>Application.MessageBox(%1, %3{''}, %2)</code><br>	
+					<small>Template specified for <code>MsgBox</code>.</small></td>
+					<td><code>if Application.MessageBox('Sure?', '', MB_YESNO) = ID_YES then</code></td>
+				</tr>								
+				<tr>
+					<td><code>Dim vt as VBA.VbVarType</code></td>
+					<td><code>TVarType</code><br>	
+					<small>Template specified for <code>VbVarType</code>.</small></td>
+					<td><code>var vt : TVarType;</code></td>
+				</tr>
+				<tr>
+					<td><code>br = vbAbort</code></td>
+					<td><code>ID_ABORT</code><br>	
+					<small>Template specified for <code>vbAbort</code>.</small></td>
+					<td><code>br := ID_ABORT;</code></td>
+				</tr>
+				<tr>
+					<td><code>SavePicture pic, "mypic.bmp"</code></td>
+					<td>
+						<code>%1.SaveToFile(%2)</code><br>	
+						<small>Template specified for <code>SavePicture</code>.</small>
+					</td>
+					<td><code>pic.SaveToFile('mypic.bmp');</code></td>
+				</tr>
+				<tr>
+					<td><code>MyProperty = 10 * n</code></td>
+					<td>
+						<code>MyPropertyProc(%V)</code><br>	
+						<small>
+						Template specified for <code>MyProperty</code>.<br>
+						This is an example of a fullMap.
+						</small>
+					</td>
+					<td><code>MyPropertyProc( 10 * n );</code></td>
+				</tr>				
+			</tbody>
+		</table>		
+		<p>
+			For more mapping templates examples see <a href="../maps/VBA.vb2d">VBA.vb2d</a>.
+		</p>
+	</body>
+</html>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<library name="VBA">
+	<module name="Constants">
+		<const name="vbCrLf" map="#13#10"/>
+		<const name="vbNullChar" map="#0"/>
+		<const name="vbNullString" map="NullStr"/>
+		<const name="vbTab" map="#9"/>
+	</module>
+	<module name="Strings" fullMap="StrUtils">
+		<func name="Space" argc="2" type="string" map="StringOfChar(#32, %1)"/>
+		<func name="Left" argc="2" type="string" map="LeftStr(%1, %2)"/>
+		<func name="LeftB" argc="2" type="string" map="LeftBStr(%1, %2)"/>
+		<func name="Right" argc="2" type="string" map="RightStr(%1, %2)"/>
+		<func name="RightB" argc="2" type="string" map="RightBStr(%1, %2)"/>
+		<func name="LTrim" argc="1" type="string" map="TrimLeft(%1)"/>
+		<func name="LCase" argc="1" type="string" map="LowerCase(%1)"/>
+		<func name="UCase" argc="1" type="string" map="UpperCase(%1)"/>
+		<func name="Mid" argc="3" type="string" map="Copy(%1, %2, %3{Length(%1)})"/>
+		<func name="MidB" argc="3" type="string" map="Copy(%1, %2, %3{Length(%1)})"/>
+		<func name="InStr" argc="4" type="integer" map="PosEx(%3, %2, %1{1})"/>
+		<func name="InStrB" argc="4" type="integer" map="PosEx(%3, %2, %1{1})"/>
+	</module>	
+	<module name="Conversion" fullMap="Variants">
+		<func name="CVDate" argc="1" type="date" nameMap="VarToDateTime"/>
+	</module>
+	<module name="Information">
+		<func name="Err" type="ErrObject"/>
+	</module>			
+	<module name="FileSystem">
+		<sub name="Kill" argc="1" map="DeleteFile"/>
+	</module>
+	<module name="Interaction">
+		<func name="MsgBox" argc="5" type="long" map="Application.MessageBox( pchar(%1), pchar(%3{''}), %2{MB_OK} ) {HelpFile:%4{None}, Context:%5{None}}"/>
+	</module>	
+	<class name="ErrObject">
+		<sub name="Clear"/>
+		<sub name="Raise" argc="4" fullMap="raise Exception.CreateFmt('Error(%%d): %%s', [%1{0},%2{''}])"/>
+		<var name="Description" type="string"/>
+		<var name="HelpContext" type="long"/>
+		<var name="HelpFile" type="string"/>
+		<var name="LastDllError" type="long"/>
+		<var name="Number" type="long"/>
+		<var name="Source" type="string"/>
+	</class>				
+	<enum name="VbVarType" fullMap="TVarType"/>
+	<enum name="VbMsgBoxStyle" fullMap="integer">
+		<const name="vbOKCancel" map="MB_OKCANCEL"/>
+		<const name="vbOKOnly" map="MB_OK"/>
+		<const name="vbQuestion" map="MB_ICONQUESTION"/>
+		<const name="vbRetryCancel" map="MB_RETRYCANCEL"/>
+		<const name="vbSystemModal" map="MB_SYSTEMMODAL"/>
+		<const name="vbYesNo" map="MB_YESNO"/>
+		<const name="vbYesNoCancel" map="MB_YESNOCANCEL"/>
+		<const name="vbInformation" map="MB_ICONINFORMATION"/>
+		<const name="vbExclamation" map="MB_ICONEXCLAMATION"/>
+		<const name="vbAbortRetryIgnore" map="MB_ABORTRETRYIGNORE"/>
+		<const name="vbCritical" map="MB_ICONHAND"/>
+	</enum>
+	<enum name="VbMsgBoxResult" fullMap="integer">
+		<const name="vbAbort" map="ID_ABORT"/>
+		<const name="vbCancel" map="ID_CANCEL"/>
+		<const name="vbIgnore" map="ID_IGNORE"/>
+		<const name="vbNo" map="ID_NO"/>
+		<const name="vbOK" map="ID_OK"/>
+		<const name="vbYes" map="ID_YES"/>
+		<const name="vbRetry" map="ID_RETRY"/>
+	</enum>	
+</library>

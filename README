@@ -1,0 +1,32 @@
+Introduction
+============
+
+VB2Delphi Migration Kit is a Visual Basic 6 to Delphi source code conversion tool. 
+The current version supports syntactic translation of .BAS, .CLS, .FRM and .VBP files. 
+It provides a "conversion maps" facility to specify the mapping from VB6 libraries entities 
+to Delphi equivalents. See help/maps.htm.
+
+The following features are not currently converted:
+
+  - On Error, Lock, Unlock, Resume, Return, Time, ForEach
+  - Form control descriptions (.FRX)
+  - Implements
+
+The source code is released under the terms of the MIT License.
+  - http://www.opensource.org/licenses/mit-license.php
+  - http://en.wikipedia.org/wiki/MIT_License
+
+Compiling
+=========
+
+The source code was written in Delphi 7. 
+To compile, you need the following libraries:
+
+  - DelphiCollections at http://www.warmachine.u-net.com/delphi_collections/
+  - JEDI Code Library at http://sourceforge.net/projects/jcl/
+  - FastMM4 at http://sourceforge.net/projects/fastmm/
+
+The GenVB2D tool uses TLBINF32.DLL at runtime.
+This is a higher-level COM interface to get type library information.
+  
+  - Help Files for Tlbinf32.dll at http://support.microsoft.com/kb/224331
